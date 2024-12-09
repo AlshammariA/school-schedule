@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1 id="classroom-title">الواجبات الأسبوعية</h1>
+  <div class="table-container">
+    <table id="homework-table">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <button id="back-button">الرجوع إلى الصفحة الرئيسية</button>
+
+  <!-- Popup for cell value -->
+  <div id="popup" class="popup" style="display: none;">
+    <div class="popup-content">
+      <p id="popup-value"></p>
+      <button id="close-popup">إغلاق</button>
+    </div>
+  </div>
+
+  <script>
+    // Load data from localStorage
+    const classroom = localStorage.getItem("classroom");
+    const tableData = JSON.parse(localStorage.getItem("tableData"));
+
+    if (classroom && tableData) {
+      document.getElementById("classroom-title").textContent = `الواجبات الأسبوعية - ${classroom}`;
+
+      // Build table headers
+      const headers = Object.keys(tableData[0]).slice(1);
+      const thead = document.querySelector("#homework-table thead");
+      thead.innerHTML = `
+        <tr>
+          ${headers.map(header => `<th>${header}</th>`).join("")}
+          <th>اليوم</th>
+        </tr>
+      `;
+
+      // Build table body
+      const tbody = document.querySelector("#homework-table tbody");
+      tbody.innerHTML = tableData.map(row => `
+        <tr>
+          ${headers.map(header => `
+            <td>
+              <button class="cell-button" onclick="showPopup('${row[header]}')">عرض</button>
+            </td>`).join("")}
+          <td><b>${row.Day}</b></td>
+        </tr>
+      `).join("");
+    } else {
+      alert("لا توجد بيانات متاحة!");
+    }
+
+    // Back button
+    document.getElementById("back-button").onclick = () => {
+      window.location.href = "index.html";
+    };
+
+    // Show popup with cell value
+    window.showPopup = (value) => {
+      const popup = document.getElementById("popup");
+      const popupValue = document.getElementById("popup-value");
+      popupValue.textContent = value || "لا يوجد قيمة";
+      popup.style.display = "flex";
+    };
+
+    // Close popup
+    document.getElementById("close-popup").onclick = () => {
+      document.getElementById("popup").style.display = "none";
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Homework</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Weekly Homework</h1>
+  <div id="buttons"></div>
+  <div id="loading-popup" class="popup" style="display: none;">
+    <div class="popup-content">Loading, please wait...</div>
+  </div>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbzFslKFQIUgrnfpOcqcaMjhnUgn8B150va4qPDNLcxwqnDdKfNsIEMNbtg9fgWw0bnc/exec";
+
+    const classrooms = ["class11", "class12"];
+
+    // Create buttons for each classroom
+    const buttonContainer = document.getElementById("buttons");
+    classrooms.forEach(classroom => {
+      const button = document.createElement("button");
+      button.textContent = classroom;
+      button.onclick = () => loadClassroom(classroom);
+      buttonContainer.appendChild(button);
+    });
+
+    // Redirect to dashboard with classroom data
+    async function loadClassroom(classroom) {
+      const popup = document.getElementById("loading-popup");
+      popup.style.display = "block"; // Show popup
+
+      try {
+        const response = await fetch(`${apiUrl}?sheetName=${classroom}`);
+        const data = await response.json();
+
+        if (data.error) {
+          alert(data.error);
+          popup.style.display = "none";
+          return;
+        }
+
+        // Pass data to dashboard
+        localStorage.setItem("classroom", classroom);
+        localStorage.setItem("tableData", JSON.stringify(data.data));
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        alert("Error fetching data. Please try again later.");
+      } finally {
+        popup.style.display = "none"; // Hide popup
+      }
+    }
+  </script>
+</body>
+</html>

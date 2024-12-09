@@ -14,26 +14,34 @@
   </div>
 
   <script>
-    const apiUrl = "https://script.google.com/macros/s/AKfycbzFslKFQIUgrnfpOcqcaMjhnUgn8B150va4qPDNLcxwqnDdKfNsIEMNbtg9fgWw0bnc/exec";
+    let apiUrl;
 
-    const classrooms = ["class11", "class12"];
+    // Load settings.json dynamically
+    fetch("settings.json")
+      .then(response => response.json())
+      .then(settings => {
+        apiUrl = settings.apiUrl;
 
-    // Create buttons for each classroom
-    const buttonContainer = document.getElementById("buttons");
-    classrooms.forEach(classroom => {
-      const button = document.createElement("button");
-      button.textContent = classroom;
-      button.onclick = () => loadClassroom(classroom);
-      buttonContainer.appendChild(button);
-    });
+        // Create buttons for each classroom
+        const buttonContainer = document.getElementById("buttons");
+        settings.classrooms.forEach(classroom => {
+          const button = document.createElement("button");
+          button.textContent = classroom.name; // Use descriptive name for the button
+          button.onclick = () => loadClassroom(classroom.sheetName);
+          buttonContainer.appendChild(button);
+        });
+      })
+      .catch(error => {
+        console.error("Error loading settings:", error);
+      });
 
     // Redirect to dashboard with classroom data
-    async function loadClassroom(classroom) {
+    async function loadClassroom(sheetName) {
       const popup = document.getElementById("loading-popup");
       popup.style.display = "block"; // Show popup
 
       try {
-        const response = await fetch(`${apiUrl}?sheetName=${classroom}`);
+        const response = await fetch(`${apiUrl}?sheetName=${sheetName}`);
         const data = await response.json();
 
         if (data.error) {
@@ -43,7 +51,7 @@
         }
 
         // Pass data to dashboard
-        localStorage.setItem("classroom", classroom);
+        localStorage.setItem("classroom", sheetName);
         localStorage.setItem("tableData", JSON.stringify(data.data));
         window.location.href = "dashboard.html";
       } catch (error) {

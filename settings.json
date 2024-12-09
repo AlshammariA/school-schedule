@@ -1,0 +1,8 @@
+{
+    "apiUrl": "https://script.google.com/macros/s/AKfycbzFslKFQIUgrnfpOcqcaMjhnUgn8B150va4qPDNLcxwqnDdKfNsIEMNbtg9fgWw0bnc/exec",
+    "classrooms": [
+      { "name": "Grade 1 - Section A", "sheetName": "class11" },
+      { "name": "Grade 2 - Section B", "sheetName": "class12" }
+    ]
+  }
+  

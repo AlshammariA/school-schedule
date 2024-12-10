@@ -1,72 +1,81 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classroom Dashboard</title>
+  <title>الواجبات الأسبوعية</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1 id="classroom-title">الواجبات الأسبوعية</h1>
   <div class="table-container">
     <table id="homework-table">
-      <thead></thead>
-      <tbody></tbody>
+      <thead>
+        <tr>
+          <th>اليوم</th>
+          <th>الأولى</th>
+          <th>الثانية</th>
+          <th>الثالثة</th>
+          <th>الرابعة</th>
+          <th>الخامسة</th>
+          <th>السادسة</th>
+          <th>السابعة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be populated dynamically -->
+      </tbody>
     </table>
   </div>
   <button id="back-button">الرجوع إلى الصفحة الرئيسية</button>
 
-  <!-- Popup for cell value -->
+  <!-- Popup for displaying homework -->
   <div id="popup" class="popup" style="display: none;">
     <div class="popup-content">
-      <p id="popup-value"></p>
-      <button id="close-popup">إغلاق</button>
+      <span id="close-popup" class="close">&times;</span>
+      <h2 id="popup-class-name"></h2>
+      <p id="popup-homework"></p>
     </div>
   </div>
 
   <script>
-    // Load data from localStorage
-    const classroom = localStorage.getItem("classroom");
+    // Load classroom and table data from localStorage
+    const classroom = JSON.parse(localStorage.getItem("classroom"));
     const tableData = JSON.parse(localStorage.getItem("tableData"));
 
+    // Fallback for days
+    const daysFallback = ["الأحد", "الأثنين", "الثلاثاء", "الأربعاء", "الخميس"];
+    tableData.forEach((row, index) => {
+      row.Day = row.Day || daysFallback[index % daysFallback.length]; // Use fallback if Day is missing
+    });
+
     if (classroom && tableData) {
-      document.getElementById("classroom-title").textContent = `الواجبات الأسبوعية - ${classroom}`;
+        document.getElementById("classroom-title").innerHTML = `الواجبات الأسبوعية<br><span class="classroom-name">${classroom.name}</span>`;
 
-      // Build table headers
-      const headers = Object.keys(tableData[0]).slice(1);
-      const thead = document.querySelector("#homework-table thead");
-      thead.innerHTML = `
-        <tr>
-          ${headers.map(header => `<th>${header}</th>`).join("")}
-          <th>اليوم</th>
-        </tr>
-      `;
-
-      // Build table body
       const tbody = document.querySelector("#homework-table tbody");
       tbody.innerHTML = tableData.map(row => `
         <tr>
-          ${headers.map(header => `
-            <td>
-              <button class="cell-button" onclick="showPopup('${row[header]}')">عرض</button>
-            </td>`).join("")}
-          <td><b>${row.Day}</b></td>
+          <td>${row.Day || 'غير متوفر'}</td>
+          ${['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة'].map(period => {
+            const [subject, homework] = (row[period] || '|').split('|').map(value => value.trim());
+            return `
+              <td>
+                <span>${subject || 'لا يوجد موضوع'}</span><br>
+                <button class="cell-button" onclick="showPopup('${subject}', '${homework}')">عرض الواجب</button>
+              </td>`;
+          }).join("")}
         </tr>
       `).join("");
     } else {
       alert("لا توجد بيانات متاحة!");
     }
 
-    // Back button
-    document.getElementById("back-button").onclick = () => {
-      window.location.href = "index.html";
-    };
+    // Show popup with homework
+    window.showPopup = (subject, homework) => {
+    //   document.getElementById("popup-class-name").textContent = subject || "لا يوجد موضوع"; // Show subject
+      document.getElementById("popup-class-name").textContent = homework || "لا يوجد واجب"; // Show homework
 
-    // Show popup with cell value
-    window.showPopup = (value) => {
       const popup = document.getElementById("popup");
-      const popupValue = document.getElementById("popup-value");
-      popupValue.textContent = value || "لا يوجد قيمة";
       popup.style.display = "flex";
     };
 
@@ -74,6 +83,13 @@
     document.getElementById("close-popup").onclick = () => {
       document.getElementById("popup").style.display = "none";
     };
+
+    // Back button functionality
+    document.getElementById("back-button").onclick = () => {
+      window.location.href = "index.html";
+    };
+
+    console.log(tableData); // Debugging: Ensure the data structure includes "Day"
   </script>
 </body>
 </html>

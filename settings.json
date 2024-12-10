@@ -1,8 +1,9 @@
 {
     "apiUrl": "https://script.google.com/macros/s/AKfycbzFslKFQIUgrnfpOcqcaMjhnUgn8B150va4qPDNLcxwqnDdKfNsIEMNbtg9fgWw0bnc/exec",
     "classrooms": [
-      { "name": "Grade 1 - Section A", "sheetName": "class11" },
-      { "name": "Grade 2 - Section B", "sheetName": "class12" }
+      { "name": "الصف الأول متوسط", "sheetName": "class11" , "color": "#557aa2"},
+      { "name": "الصف الثاني متوسط", "sheetName": "class21", "color": "#557aa2" },
+      { "name": "الصف الثالث متوسط", "sheetName": "class31", "color": "#557aa2" }
     ]
   }
   

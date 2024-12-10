@@ -1,33 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weekly Homework</title>
+  <title>الواجبات الأسبوعية</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Weekly Homework</h1>
+  <h1>الواجبات الأسبوعية</h1>
   <div id="buttons"></div>
   <div id="loading-popup" class="popup" style="display: none;">
-    <div class="popup-content">Loading, please wait...</div>
+    <div class="loading-content">
+      <p>جاري تحديث الجدول، يُرجى الإنتظار ... </p>
+    </div>
   </div>
 
   <script>
-    let apiUrl;
-
-    // Load settings.json dynamically
+    // Fetch settings.json dynamically
     fetch("settings.json")
       .then(response => response.json())
       .then(settings => {
-        apiUrl = settings.apiUrl;
-
-        // Create buttons for each classroom
         const buttonContainer = document.getElementById("buttons");
+
         settings.classrooms.forEach(classroom => {
           const button = document.createElement("button");
-          button.textContent = classroom.name; // Use descriptive name for the button
-          button.onclick = () => loadClassroom(classroom.sheetName);
+          button.textContent = classroom.name; // Display classroom name
+          button.style.backgroundColor = classroom.color; // Set button color
+          button.onclick = () => loadClassroom(settings.apiUrl, classroom);
           buttonContainer.appendChild(button);
         });
       })
@@ -36,12 +35,12 @@
       });
 
     // Redirect to dashboard with classroom data
-    async function loadClassroom(sheetName) {
+    async function loadClassroom(apiUrl, classroom) {
       const popup = document.getElementById("loading-popup");
-      popup.style.display = "block"; // Show popup
+      popup.style.display = "flex"; // Show popup
 
       try {
-        const response = await fetch(`${apiUrl}?sheetName=${sheetName}`);
+        const response = await fetch(`${apiUrl}?sheetName=${classroom.sheetName}`);
         const data = await response.json();
 
         if (data.error) {
@@ -51,7 +50,7 @@
         }
 
         // Pass data to dashboard
-        localStorage.setItem("classroom", sheetName);
+        localStorage.setItem("classroom", JSON.stringify(classroom)); // Save full classroom info
         localStorage.setItem("tableData", JSON.stringify(data.data));
         window.location.href = "dashboard.html";
       } catch (error) {
